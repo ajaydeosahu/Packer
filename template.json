@@ -1,0 +1,61 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "us-east-1",
+      "source_ami": "ami-0149b2da6ceec4bb0",
+      "instance_type": "t3a.xlarge",
+      "ssh_username": "ubuntu",
+      "ami_name": "zevbit-production-ubuntu-20.04-{{timestamp}}",
+	  "tags":{
+		"Name": "zevbit-production-ubuntu-20.04-{{timestamp}}",
+    "Environment": "zevbit-production",
+    "Organisation": "zevbit"
+	  }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+      "update.sh",
+      "install-nodejs.sh",
+      "install-jq.sh",
+      "install-pm2.sh",
+      "install-codedeployagent.sh",
+      "install-nginx.sh",
+      "permissions.sh",
+      "install-cloudwatchagent.sh",
+      "create-user.sh",
+      "update-ssh.sh",
+      "cis.sh"
+     ]	
+    },
+    {
+      "type": "file",
+      "source": "certificate.crt",
+      "destination": "/etc/nginx/certs/certificate.crt"
+    },
+    {
+      "type": "file",
+      "source": "private.key",
+      "destination": "/etc/nginx/certs/private.key"
+    },
+    {
+      "type": "file",
+      "source": "backend.conf",
+      "destination": "/etc/nginx/conf.d/backend.conf"
+    },
+    {
+      "type": "file",
+      "source": "nginx.conf",
+      "destination": "/etc/nginx/nginx.conf"
+    }   
+  ]
+}
